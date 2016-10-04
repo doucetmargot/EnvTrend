@@ -1,14 +1,19 @@
-function [] = plotresidualsgam(X,Y,PARS,Nd_ind) 
+function [] = plotresidualsgam(X,Y,PARS,Nd_ind,Md_ind) 
 
 % Function generates probability plot for residuals of linear regression
 % based on gamma distribution of residuals. Residials are normalized by
 % dividing by the expected value.
 
-res_d = Y(~Nd_ind)./(polyval(PARS(1:2),X(~Nd_ind))); %% Mean is forced to 1, independent of X
+d_ind = and(~Nd_ind,~Md_ind);
+
+res_d = Y(d_ind)./(polyval(PARS(1:2),X(d_ind))); %% Mean is forced to 1, independent of X
 
 
 
 N = 100;
+
+%--- values less than detection limit replaced with 1000 samples generated from assumed distribution:
+
 
 dx = Y(Nd_ind)/(N); 
 AB = repmat(dx,1,N+1);
@@ -37,6 +42,39 @@ Samples(m,:) = randsample(Intervals_RanGen(m,:),1000,true,ProbsCon(m,:));  % gen
 
 end
 
+%--- values greater than detection limit replaced with 1000 samples generated from assumed distribution:
+
+sigma = PARS(3).*polyval(PARS(1:2),X(Md_ind));
+
+dxm = sigma.*3.5./N; 
+
+ABm = repmat(dxm,1,N+1);
+ABm(:,1) = Y(Md_ind);
+Evalintervalsm = cumsum(ABm,2); 
+
+Intervals_RanGenm = Evalintervalsm(:,2:101);% dimensions are # mds x 100 - representing possible values from reported limit to (limit + 3.5*standard deviation)
+
+XMd = X(Md_ind);
+Samplesm = zeros(length(Y(Md_ind)),1000);
+
+for i=1:size(Y(Md_ind))
+   
+  Probsm(i,:) = diff(gamcdf(Evalintervalsm(i,:),1/(PARS(3)^2),(PARS(3)^2)*(PARS(1)*XMd(i)+PARS(2))));
+  
+ end
+
+ if size(Y(Md_ind)) > 0
+     ProbsConm = Probsm./repmat(sum(Probsm,2),1,100); % conditional probabilities, given that it is known that observation is below dl: dimensions are # nds x 100
+ end
+  
+for m=1:size(Y(Md_ind))
+
+Samplesm(m,:) = randsample(Intervals_RanGenm(m,:),1000,true,ProbsConm(m,:));  % generates 1000 random values for each nd given conditional probabilities
+
+end
+
+%--- test goodness of fit on each of the 1000 sample sets generated:
+
 
 for j = 1:1000
     
@@ -44,7 +82,9 @@ for j = 1:1000
 
 res_nd = Samples(:,j)./(polyval(PARS(1:2),X(Nd_ind)));
 
-res = (vertcat(res_d,res_nd));
+res_md = Samplesm(:,j)./(polyval(PARS(1:2),X(Md_ind)));
+
+res = (vertcat(res_d,res_nd,res_md));
 
 if length(res)>15;
 

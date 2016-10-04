@@ -100,20 +100,22 @@ if n >3;
 
 Sorted = sortrows(horzcat(xfiltered,Y,Nd_ind,Md_ind),1);
 
+% 
+% for i = 1:n-1  
+%     
+%     for j = i+1:n
+%         
+% [Sij,VarS_x1ij, VarS_x3ij,VarS_y1ij, VarS_y3ij] =  man_k(Sorted,i,j);
+%  S = S + Sij;
+% VarS_x1=VarS_x1 + VarS_x1ij;
+% VarS_x3=VarS_x3 + VarS_x3ij;
+% VarS_y1=VarS_y1 + VarS_y1ij;
+% VarS_y3=VarS_y3 + VarS_y3ij;
+%     
+%     end
+% end
 
-for i = 1:n-1  
-    
-    for j = i+1:n
-        
-[Sij,VarS_x1ij, VarS_x3ij,VarS_y1ij, VarS_y3ij] =  man_k(Sorted,i,j);
- S = S + Sij;
-VarS_x1=VarS_x1 + VarS_x1ij;
-VarS_x3=VarS_x3 + VarS_x3ij;
-VarS_y1=VarS_y1 + VarS_y1ij;
-VarS_y3=VarS_y3 + VarS_y3ij;
-    
-    end
-end
+[S,VarS_x1,VarS_x3,VarS_y1, VarS_y3] = man_k_faster(Sorted,n);
 
 VarS = (1/18*(n*(n-1)*(2*n+5))-VarS_x1-VarS_y1)+(1/(2*n*(n-1)))*VarS_x3*VarS_y3;
 
@@ -151,7 +153,7 @@ end
 
 I = tiedrank(y_repnd); 
 
-     [Acx,lags,Bounds]=autocorr(I,n-1);
+     [Acx,~,Bounds]=autocorr(I,n-1);
      
 
     ros=Acx(2:end); %% Autocorrelation Ranks
@@ -170,7 +172,7 @@ I = tiedrank(y_repnd);
 %%%%%% THEIL SEN  
 
 
-[N c]=size(x);
+[N ~]=size(x);
 
 
 Comb = combnk(1:N,2);
@@ -179,7 +181,10 @@ y_repndrand = Sorted(:,2);
 
 
 if ~isempty(theil_ndind)
-    for i = 1:1000
+    
+    Senline_i(i) = zeros(1,100);
+    
+    for i = 1:100
 
 
     y_repndrand(theil_ndind) = Sorted(theil_ndind,2).*rand(size(Sorted(theil_ndind,2))); 
@@ -197,8 +202,8 @@ if ~isempty(theil_ndind)
     Senline = mean(Senline_i);
 
     Senline_sorted = sort(Senline_i);
-    Senline_min = Senline_sorted(50);
-    Senline_max = Senline_sorted(950);
+    Senline_min = Senline_sorted(5);
+    Senline_max = Senline_sorted(95);
 
     
 else
@@ -222,87 +227,95 @@ AkTheiSen = @(p) ATS_func(p,Sorted,n);
 
       
      
-     clear ATK_slopes ATK_slopes2 ATK_slopes3 ATK_slopes4 ATK_S ATK_S2 ATK_S3 ATK_S4 ind_neg ind_pos
+     clear ATK_slopes ATK_S 
      
 
- ATK_slopes = (2*(min(Sorted(:,2))-max(Sorted(:,2)))/min(deltax(theil_ind)):(max(Sorted(:,2))-min(Sorted(:,2)))/100:2*(max(Sorted(:,2))-min(Sorted(:,2)))/min(deltax(theil_ind)));   % All possible slopes
-    
-    if isempty(ATK_slopes)
+ ATK_slopes = (min(theil):(max(theil)-min(theil))/100:max(theil));
+ ATK_S = zeros(size(ATK_slopes));
+ 
+  if isempty(ATK_slopes)
         
         Akritas_Theil_Sen_line = 0;
         
     else
         
                 for m = 1:length(ATK_slopes)
-           ATK_S(m) = AkTheiSen(ATK_slopes(m));         % S-Values corresponding to slopes
-        end
-    
-       
+                ATK_S(m) = AkTheiSen(ATK_slopes(m));         % S-Values corresponding to slopes
+                end
     
                 ind_neg = find(ATK_S>0,1,'last');
                 ind_pos = find((ATK_S<0),1,'first');
 
+              
+                Akritas_Theil_Sen_line = (ATK_slopes(ind_neg)+ATK_slopes(ind_pos))/(2);
+                
+                if abs(Akritas_Theil_Sen_line)*365.25 >= 1e-6 ;
+                
+                 ATK_slopes = (ATK_slopes(ind_neg):(ATK_slopes(ind_pos)-ATK_slopes(ind_neg))/100:ATK_slopes(ind_pos));   
 
-                ATK_slopes2 = (ATK_slopes(ind_neg):(ATK_slopes(ind_pos)-ATK_slopes(ind_neg))/100:ATK_slopes(ind_pos));   
-
-               for m = 1:length(ATK_slopes2)
-                    ATK_S2(m) = AkTheiSen(ATK_slopes2(m));         % S-Values corresponding to slopes
+               for m = 1:length(ATK_slopes)
+                    ATK_S(m) = AkTheiSen(ATK_slopes(m));         % S-Values corresponding to slopes
                end
 
             
-                    ind_neg = find(ATK_S2>0,1,'last');
-                    ind_pos = find((ATK_S2<0),1,'first');
+                    ind_neg = find(ATK_S>0,1,'last');
+                    ind_pos = find((ATK_S<0),1,'first');
 
 
-                    ATK_slopes3 = (ATK_slopes2(ind_neg):(ATK_slopes2(ind_pos)-ATK_slopes2(ind_neg))/100:ATK_slopes2(ind_pos));   
+                    Akritas_Theil_Sen_line = (ATK_slopes(ind_neg)+ATK_slopes(ind_pos))/(2);
+                
+                    if abs(Akritas_Theil_Sen_line)*365.25 >= 1e-6 ;
+                    
+                    
+                   ATK_slopes = (ATK_slopes(ind_neg):(ATK_slopes(ind_pos)-ATK_slopes(ind_neg))/100:ATK_slopes(ind_pos));   
 
-                   for m = 1:length(ATK_slopes3)
-                        ATK_S3(m) = AkTheiSen(ATK_slopes3(m));         % S-Values corresponding to slopes
+                   for m = 1:length(ATK_slopes)
+                        ATK_S(m) = AkTheiSen(ATK_slopes(m));         % S-Values corresponding to slopes
                    end
 
 
                     
-                        ind_neg = find(ATK_S3>0,1,'last');
-                        ind_pos = find((ATK_S3<0),1,'first');
+                        ind_neg = find(ATK_S>0,1,'last');
+                        ind_pos = find((ATK_S<0),1,'first');
 
 
-                       ATK_slopes4 = (ATK_slopes3(ind_neg):(ATK_slopes3(ind_pos)-ATK_slopes3(ind_neg))/100:ATK_slopes3(ind_pos));   
+                        Akritas_Theil_Sen_line = (ATK_slopes(ind_neg)+ATK_slopes(ind_pos))/(2);
+                
+                         if abs(Akritas_Theil_Sen_line)*365.25 >= 1e-6 ;
+                    
+                        
+                       ATK_slopes = (ATK_slopes(ind_neg):(ATK_slopes(ind_pos)-ATK_slopes(ind_neg))/100:ATK_slopes(ind_pos));   
 
-                       for m = 1:length(ATK_slopes4)
-                            ATK_S4(m) = AkTheiSen(ATK_slopes4(m));         % S-Values corresponding to slopes
+                       for m = 1:length(ATK_slopes)
+                            ATK_S(m) = AkTheiSen(ATK_slopes(m));         % S-Values corresponding to slopes
                        end
 
-                        ind_neg = find(ATK_S4>0,1,'last');
-                        ind_pos = find((ATK_S4<0),1,'first');
+                        ind_neg = find(ATK_S>0,1,'last');
+                        ind_pos = find((ATK_S<0),1,'first');
                         
+                        Akritas_Theil_Sen_line = (ATK_slopes(ind_neg)+ATK_slopes(ind_pos))/(2);
+                
+                        if abs(Akritas_Theil_Sen_line)*365.25 >= 1e-6 ;
                            
-                       ATK_slopes5 = (ATK_slopes4(ind_neg):(ATK_slopes4(ind_pos)-ATK_slopes4(ind_neg))/100:ATK_slopes4(ind_pos));   
+                       ATK_slopes = (ATK_slopes(ind_neg):(ATK_slopes(ind_pos)-ATK_slopes(ind_neg))/100:ATK_slopes(ind_pos));   
 
-                       for m = 1:length(ATK_slopes5)
-                            ATK_S5(m) = AkTheiSen(ATK_slopes5(m));         % S-Values corresponding to slopes
+                       for m = 1:length(ATK_slopes)
+                            ATK_S(m) = AkTheiSen(ATK_slopes(m));         % S-Values corresponding to slopes
                        end
 
-                        ind_neg = find(ATK_S5>0,1,'last');
-                        ind_pos = find((ATK_S5<0),1,'first');
+                        ind_neg = find(ATK_S>0,1,'last');
+                        ind_pos = find((ATK_S<0),1,'first');
 
-                        Akritas_Theil_Sen_line = (ATK_slopes5(ind_neg)+ATK_slopes5(ind_pos))/(2);
+                        Akritas_Theil_Sen_line = (ATK_slopes(ind_neg)+ATK_slopes(ind_pos))/(2);
                         
-
+                        end
+                         end
+                    end
+                end
+    
    end
         
 
-    
-     
-%     [Akritas_Theil_Sen_line1,Sval1] = fzero(AkTheiSen,Senline+0.0000001); 
-%     
-%     [Akritas_Theil_Sen_line2,Sval2] = fzero(AkTheiSen,Senline-0.0000001); 
-%     
-%             
-%     Akritas_Theil_Sen_line=(Akritas_Theil_Sen_line1+Akritas_Theil_Sen_line2)/(2);
-%     
-%     if  Akritas_Theil_Sen_line < 0.0000001
-%         Akritas_Theil_Sen_line = 0;
-%     end
     
          
 else

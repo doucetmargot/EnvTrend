@@ -11,13 +11,16 @@ Residuals = Sorted;
 
 Residuals(:,2) = Sorted(:,2)- Residuals(:,1).*p;
 
-for i = 1:n-1  
-    
-    for j = i+1:n
-        
-[Sij,~,~,~,~] =  man_k(Residuals,i,j);
- S = S + Sij;
-    
-    end
-end
+% for i = 1:n-1  
+%     
+%     for j = i+1:n
+%         
+% [Sij,~,~,~,~] =  man_k(Residuals,i,j);
+%  S = S + Sij;
+%     
+%     end
+% end
 
+
+[S,~,~,~, ~] = man_k_faster(Residuals,n);
+end

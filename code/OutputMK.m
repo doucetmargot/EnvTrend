@@ -68,7 +68,16 @@ else
     set(handles.text16,'String',sprintf('Theil-Sen Slope = %#.2g/year',Senline_min(1)*365.25));
 end
     
-   set(handles.text13,'String',sprintf('Akritas-Theil-Sen Slope = %#.2g/year',Akritas_Theil_Sen_line(1)*365.25));
+
+ if abs(Akritas_Theil_Sen_line(1))*365.25 >= 1e-6 ;
+
+set(handles.text13,'String',sprintf('Akritas-Theil-Sen Slope = %#.2g/year',Akritas_Theil_Sen_line(1)*365.25));
+
+ else
+     
+     set(handles.text13,'String','Akritas-Theil-Sen Slope < 1e-6/year');
+ end
+
 
  
 
@@ -140,9 +149,14 @@ else
     set(handles.text16,'String',sprintf('Theil-Sen Slope = %#.2g/year',Senline_min(1)*365.25));
 end
 
+ if abs(Akritas_Theil_Sen_line(1))*365.25 >= 1e-6 ;
 
 set(handles.text13,'String',sprintf('Akritas-Theil-Sen Slope = %#.2g/year',Akritas_Theil_Sen_line(1)*365.25));
 
+ else
+     
+     set(handles.text13,'String','Akritas-Theil-Sen Slope < 1e-6/year');
+ end
 
 
 

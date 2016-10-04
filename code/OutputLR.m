@@ -234,19 +234,19 @@ set(hObject, 'String', setstoanalyze);
 
 % --- Executes on button press in pushbutton4.
 function pushbutton4_Callback(hObject, eventdata, handles)
-global Xi Yi  PARSnormi Nd_indi
-plotresidualsnorm(Xi,Yi,PARSnormi,Nd_indi) 
+global Xi Yi  PARSnormi Nd_indi Md_indi
+plotresidualsnorm(Xi,Yi,PARSnormi,Nd_indi, Md_indi) 
 
 
 % --- Executes on button press in pushbutton7.
 function pushbutton7_Callback(hObject, eventdata, handles)
-global Xi Yi PARS_logi Nd_indi
-plotresidualslognorm(Xi,Yi,PARS_logi,Nd_indi) 
+global Xi Yi PARS_logi Nd_indi Md_indi
+plotresidualslognorm(Xi,Yi,PARS_logi,Nd_indi, Md_indi) 
 
 % --- Executes on button press in pushbutton10.
 function pushbutton10_Callback(hObject, eventdata, handles)
-global Xi Yi PARS_gami Nd_indi
-plotresidualsgam(Xi,Yi,PARS_gami,Nd_indi) 
+global Xi Yi PARS_gami Nd_indi Md_indi
+plotresidualsgam(Xi,Yi,PARS_gami,Nd_indi, Md_indi) 
 
 % --- Executes on button press in pushbutton9.
 function pushbutton9_Callback(hObject, eventdata, handles)

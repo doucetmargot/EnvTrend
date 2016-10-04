@@ -99,7 +99,19 @@ set(handles.text19,'String',sprintf('Number of max.-detects: %d',Nmdobs));
    set(handles.text18,'String',sprintf('Theil-Sen Slope = %#.2g/year',Senline_min(1)*365.25));
   end
   
-   set(handles.text14,'String',sprintf('Akritas-Theil-Sen Slope = %#.2g/year',Akritas_Theil_Sen_line(1)*365.25));
+  
+ if abs(Akritas_Theil_Sen_line(1))*365.25 >= 1e-6 ;
+
+    set(handles.text14,'String',sprintf('Akritas-Theil-Sen Slope = %#.2g/year',Akritas_Theil_Sen_line(1)*365.25));
+
+ elseif isnan(Akritas_Theil_Sen_line(1));
+     
+     set(handles.text14,'String','Akritas-Theil-Sen Slope = NaN');
+     
+ else
+     
+     set(handles.text14,'String','Akritas-Theil-Sen Slope < 1e-6/year');
+ end
 
 
 
@@ -200,9 +212,21 @@ set(handles.text19,'String',sprintf('Number of max.-detects: %d',Nmdobs));
   end
   
 
+  
+ if abs(Akritas_Theil_Sen_line(get(handles.popupmenu2, 'Value')))*365.25 >= 1e-6 ;
 
+    set(handles.text14,'String',sprintf('Akritas-Theil-Sen Slope = %#.2g/year',Akritas_Theil_Sen_line(get(handles.popupmenu2, 'Value'))*365.25));
+
+ elseif isnan(Akritas_Theil_Sen_line(get(handles.popupmenu2, 'Value')));
+     
+     set(handles.text14,'String','Akritas-Theil-Sen Slope = NaN');
+     
+ else
+     
+     set(handles.text14,'String','Akritas-Theil-Sen Slope < 1e-6/year');
+ end
    
-   set(handles.text14,'String',sprintf('Akritas-Theil-Sen Slope = %#.2g/year',Akritas_Theil_Sen_line(get(handles.popupmenu2, 'Value'))*365.25));
+
 
 
 
@@ -340,7 +364,18 @@ datetick('x','mmm-yy')
     set(handles.text18,'String',sprintf('Theil-Sen Slope = %#.2g/year',Senline_min(get(handles.popupmenu2, 'Value'))*365.25));
   end
 
+ if abs(Akritas_Theil_Sen_line(get(handles.popupmenu2, 'Value')))*365.25 >= 1e-6 ;
+
     set(handles.text14,'String',sprintf('Akritas-Theil-Sen Slope = %#.2g/year',Akritas_Theil_Sen_line(get(handles.popupmenu2, 'Value'))*365.25));
+
+elseif isnan(Akritas_Theil_Sen_line(get(handles.popupmenu2, 'Value')));
+     
+     set(handles.text14,'String','Akritas-Theil-Sen Slope = NaN');
+     
+ else
+     
+     set(handles.text14,'String','Akritas-Theil-Sen Slope < 1e-6/year');
+ end
 
 
 % --- Executes during object creation, after setting all properties.

@@ -39,6 +39,13 @@ VarS_y3=0;
             
         elseif and(XY(i,2)==XY(j,2),and(XY(i,3)== 0,XY(j,3)== 1));
             S=-1;
+                        
+        elseif and(XY(i,2)==XY(j,2),and(XY(i,4)== 1,XY(j,4)== 0));
+            S=-1;
+            
+        elseif and(XY(i,2)==XY(j,2),and(XY(i,4)== 0,XY(j,4)== 1));
+            S=1;
+                        
         else
             S=0;
             VarS_y1 = 18;

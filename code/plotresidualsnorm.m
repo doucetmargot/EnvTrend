@@ -1,21 +1,24 @@
-function [] = plotresidualsnorm(X,Y,PARS,Nd_ind) 
+function [] = plotresidualsnorm(X,Y,PARS,Nd_ind,Md_ind) 
 
 % Function generates probability plot for residuals of linear regression
 % based on lognormal distribution of residuals. Residials are normalized by
 % subtractin the expected value.
 
+d_ind = and(~Nd_ind,~Md_ind);
 
-res_d = Y(~Nd_ind)- polyval(PARS(1:2),X(~Nd_ind));
+res_d = Y(d_ind)- polyval(PARS(1:2),X(d_ind));
 
 
 N = 100;
+
+%--- values less than detection limit replaced with 1000 samples generated from assumed distribution:
 
 dx = Y(Nd_ind)/(N); 
 AB = repmat(dx,1,N+1);
 AB(:,1) = - polyval(PARS(1:2),X(Nd_ind)) ;
 Evalintervals = cumsum(AB,2); 
 
-Intervals_RanGen = Evalintervals(:,2:101);% dimensions are # nds x 100 - representing incremental possible non-detect values from 0 to respective detection limit
+Intervals_RanGen = Evalintervals(:,2:101);% dimensions are # nds x 100 - representing residuals of possible non-detect values from 0 to respective detection limit
 
 Probs = diff(normcdf(Evalintervals,0,PARS(3)),1,2);
 
@@ -32,14 +35,42 @@ Samples(i,:) = randsample(Intervals_RanGen(i,:),1000,true,ProbsCon(i,:)); % gene
 
 end
 
+%--- values greater than detection limit replaced with 1000 samples generated from assumed distribution:
+
+dxm = PARS(3)*3.5/(N); 
+ABm = repmat(dxm,[length(Y(Md_ind)),N+1]);
+ABm(:,1) = Y(Md_ind)- polyval(PARS(1:2),X(Md_ind)) ;
+Evalintervalsm = cumsum(ABm,2); 
+
+Intervals_RanGenm = Evalintervalsm(:,2:101);% dimensions are # mds x 100 - representing residuals of values from reported limit to (limit + 3.5*standard deviation)
+
+Probsm = diff(normcdf(Evalintervalsm,0,PARS(3)),1,2);
+
+ProbsConm = Probsm./repmat(sum(Probsm,2),1,100); % % conditional probabilities, given that it is known that observation is above dl: dimensions are # nds x 100
+
+
+Samplesm = zeros(length(Y(Md_ind)),1000);
+
+
+for i=1:size(Y(Md_ind))
+
+Samplesm(i,:) = randsample(Intervals_RanGenm(i,:),1000,true,ProbsConm(i,:)); % generates 1000 random values for each nd given conditional probabilities
+
+
+end
+
+
+%--- test goodness of fit on each of the 1000 sample sets generated:
+
 for j = 1:1000
        
      % for each of 1000 random sets, compute goodness of fit:
     
     res_nd = Samples(:,j);  
 
+    res_md = Samplesm(:,j); 
 
-res = vertcat(res_d,res_nd);
+res = vertcat(res_d,res_nd,res_md);
 
 if length(res)>15;
 
