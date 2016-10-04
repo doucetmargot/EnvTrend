@@ -56,6 +56,8 @@ end
 Senline = zeros(ns,1);
 Senline_min = zeros(ns,1);
 Senline_max = zeros(ns,1);
+Akritas_Theil_Sen_line = zeros(ns,1);
+
 
 %--------------- REPEAT FOR EACH SEASON:
 
@@ -157,19 +159,22 @@ VarS_corr = 0;
     
     %Mann-Kendall:
     
-        for i = 1:n-1  
-    
-        for j = i+1:n
+%         for i = 1:n-1  
+%     
+%         for j = i+1:n
+% 
+%     [Sij,VarS_x1ij, VarS_x3ij,VarS_y1ij, VarS_y3ij] =  man_k(Sorted,i,j);
+%      Slocal = Slocal + Sij;
+%     VarS_x1=VarS_x1 + VarS_x1ij;
+%     VarS_x3=VarS_x3 + VarS_x3ij;
+%     VarS_y1=VarS_y1 + VarS_y1ij;
+%     VarS_y3=VarS_y3 + VarS_y3ij;
+% 
+%         end
+%         end
 
-    [Sij,VarS_x1ij, VarS_x3ij,VarS_y1ij, VarS_y3ij] =  man_k(Sorted,i,j);
-     Slocal = Slocal + Sij;
-    VarS_x1=VarS_x1 + VarS_x1ij;
-    VarS_x3=VarS_x3 + VarS_x3ij;
-    VarS_y1=VarS_y1 + VarS_y1ij;
-    VarS_y3=VarS_y3 + VarS_y3ij;
 
-        end
-        end
+    [Slocal,VarS_x1,VarS_x3,VarS_y1, VarS_y3] = man_k_faster(Sorted,n);
 
     VarS = (1/18*(n*(n-1)*(2*n+5))-VarS_x1-VarS_y1)+(1/(2*n*(n-1)))*VarS_x3*VarS_y3;
     
@@ -196,7 +201,7 @@ VarS_corr = 0;
         
     if n > 3; 
     
-        [Acx,lags,Bounds]=autocorr(I,n-1);
+        [Acx,~,Bounds]=autocorr(I,n-1);
         
         if any(isnan(Acx))
              VarS_corr = VarS;
@@ -232,7 +237,9 @@ VarS_corr = 0;
     Comb = combnk(1:N,2);
     
     if ~isempty(theil_ndind)
-        for i = 1:1000
+        
+        Senline_i(i) = zeros(1,100);
+        for i = 1:100
 
         y(theil_ndind) = Sorted(theil_ndind,2).*rand(size(Sorted(theil_ndind,2))); 
 
@@ -256,8 +263,8 @@ VarS_corr = 0;
         Senline(season) = mean(Senline_i)/365.25;
 
         Senline_sorted = sort(Senline_i);
-        Senline_min(season) = Senline_sorted(50)/365.25;
-        Senline_max(season) = Senline_sorted(950)/365.25;
+        Senline_min(season) = Senline_sorted(5)/365.25;
+        Senline_max(season) = Senline_sorted(95)/365.25;
         
         
     else
@@ -282,10 +289,11 @@ VarS_corr = 0;
 
 AkTheiSen = @(p) (ATS_func(p,Sorted,n));
   
-  clear ATK_slopes ATK_slopes2 ATK_slopes3 ATK_slopes4 ATK_S ATK_S2 ATK_S3 ATK_S4 ind_neg ind_pos  
-
-    ATK_slopes = (2*(min(Sorted(:,2))-max(Sorted(:,2))):(max(Sorted(:,2))-min(Sorted(:,2)))/100:2*(max(Sorted(:,2))-min(Sorted(:,2))));   % All possible slopes
-    
+   clear ATK_slopes ATK_S 
+   
+     ATK_slopes = (min(theil):(max(theil)-min(theil))/100:max(theil));
+     ATK_S = zeros(size(ATK_slopes));
+     
     if sum(deltax) == 0
         
         Akritas_Theil_Sen_line(season) = NaN;
@@ -304,51 +312,72 @@ AkTheiSen = @(p) (ATS_func(p,Sorted,n));
                 ind_neg = find(ATK_S>0,1,'last');
                 ind_pos = find((ATK_S<0),1,'first');
 
-
-                ATK_slopes2 = (ATK_slopes(ind_neg):(ATK_slopes(ind_pos)-ATK_slopes(ind_neg))/100:ATK_slopes(ind_pos));   
+                
+               Akritas_Theil_Sen_line(season) = (ATK_slopes(ind_neg)+ATK_slopes(ind_pos))/(2*365.25);
+                
+                if abs(Akritas_Theil_Sen_line(season))*365.25 >= 1e-6 ;
                 
 
-                   for m = 1:length(ATK_slopes2)
-                        ATK_S2(m) = AkTheiSen(ATK_slopes2(m));         % S-Values corresponding to slopes
+                ATK_slopes = (ATK_slopes(ind_neg):(ATK_slopes(ind_pos)-ATK_slopes(ind_neg))/100:ATK_slopes(ind_pos));   
+                
+
+                   for m = 1:length(ATK_slopes)
+                        ATK_S(m) = AkTheiSen(ATK_slopes(m));         % S-Values corresponding to slopes
                    end
 
-                        ind_neg = find(ATK_S2>0,1,'last');
-                        ind_pos = find((ATK_S2<0),1,'first');
+                        ind_neg = find(ATK_S>0,1,'last');
+                        ind_pos = find((ATK_S<0),1,'first');
 
+                        
+                        Akritas_Theil_Sen_line(season) = (ATK_slopes(ind_neg)+ATK_slopes(ind_pos))/(2*365.25);
+                
+                        if abs(Akritas_Theil_Sen_line(season))*365.25 >= 1e-6 ;
+                    
 
-                        ATK_slopes3 = (ATK_slopes2(ind_neg):(ATK_slopes2(ind_pos)-ATK_slopes2(ind_neg))/100:ATK_slopes2(ind_pos));   
+                        ATK_slopes = (ATK_slopes(ind_neg):(ATK_slopes(ind_pos)-ATK_slopes(ind_neg))/100:ATK_slopes(ind_pos));   
 
-                       for m = 1:length(ATK_slopes3)
-                            ATK_S3(m) = AkTheiSen(ATK_slopes3(m));         % S-Values corresponding to slopes
+                       for m = 1:length(ATK_slopes)
+                            ATK_S(m) = AkTheiSen(ATK_slopes(m));         % S-Values corresponding to slopes
                        end
 
 
-                            ind_neg = find(ATK_S3>0,1,'last');
-                            ind_pos = find((ATK_S3<0),1,'first');
+                            ind_neg = find(ATK_S>0,1,'last');
+                            ind_pos = find((ATK_S<0),1,'first');
 
 
-                           ATK_slopes4 = (ATK_slopes3(ind_neg):(ATK_slopes3(ind_pos)-ATK_slopes3(ind_neg))/100:ATK_slopes3(ind_pos));   
-
-                           for m = 1:length(ATK_slopes4)
-                                ATK_S4(m) = AkTheiSen(ATK_slopes4(m));         % S-Values corresponding to slopes
-                           end
-
-                            ind_neg = find(ATK_S4>0,1,'last');
-                            ind_pos = find((ATK_S4<0),1,'first');
-
-
-                           ATK_slopes5 = (ATK_slopes4(ind_neg):(ATK_slopes4(ind_pos)-ATK_slopes4(ind_neg))/100:ATK_slopes4(ind_pos));   
-
-                           for m = 1:length(ATK_slopes5)
-                                ATK_S5(m) = AkTheiSen(ATK_slopes5(m));         % S-Values corresponding to slopes
-                           end
-
-                            ind_neg = find(ATK_S5>0,1,'last');
-                            ind_pos = find((ATK_S5<0),1,'first');
-
-                            Akritas_Theil_Sen_line(season) = (ATK_slopes5(ind_neg)+ATK_slopes5(ind_pos))/(2*365.25);
+                            Akritas_Theil_Sen_line(season) = (ATK_slopes(ind_neg)+ATK_slopes(ind_pos))/(2*365.25);
                 
-               
+                            if abs(Akritas_Theil_Sen_line(season))*365.25 >= 1e-6 ;
+                            
+                           ATK_slopes = (ATK_slopes(ind_neg):(ATK_slopes(ind_pos)-ATK_slopes(ind_neg))/100:ATK_slopes(ind_pos));   
+
+                           for m = 1:length(ATK_slopes)
+                                ATK_S(m) = AkTheiSen(ATK_slopes(m));         % S-Values corresponding to slopes
+                           end
+
+                            ind_neg = find(ATK_S>0,1,'last');
+                            ind_pos = find((ATK_S<0),1,'first');
+
+                            
+                           Akritas_Theil_Sen_line(season) = (ATK_slopes(ind_neg)+ATK_slopes(ind_pos))/(2*365.25);
+                
+                           if abs(Akritas_Theil_Sen_line(season))*365.25 >= 1e-6 ;
+
+                           ATK_slopes = (ATK_slopes(ind_neg):(ATK_slopes(ind_pos)-ATK_slopes(ind_neg))/100:ATK_slopes(ind_pos));   
+
+                           for m = 1:length(ATK_slopes)
+                                ATK_S(m) = AkTheiSen(ATK_slopes(m));         % S-Values corresponding to slopes
+                           end
+
+                            ind_neg = find(ATK_S>0,1,'last');
+                            ind_pos = find((ATK_S<0),1,'first');
+
+                            Akritas_Theil_Sen_line(season) = (ATK_slopes(ind_neg)+ATK_slopes(ind_pos))/(2*365.25);
+                           end
+                            end
+                        end
+                end
+                  
    end
         
 
