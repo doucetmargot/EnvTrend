@@ -184,16 +184,23 @@ VarS_corr = 0;
         x = Sorted(:,1);
         y_repnd = Sorted(:,2);
         theil_nd = Sorted(:,3);
+        theil_md = Sorted(:,4);
 
         theil_ndind = find(theil_nd);
+        theil_mdind = find(theil_md);
         
-        if ~isempty(theil_ndind)
+        if and(~isempty(theil_ndind),~isempty(theil_mdind))
 
         maxdl = max(y_repnd(theil_ndind));
+        mindl = min(y_repnd(theil_mdind));
 
-        ind_replace = find(y_repnd<=maxdl);
-        
-        y_repnd(ind_replace) = maxdl;
+        ind_replace_nd = find(y_repnd < maxdl);
+
+        ind_replace_md = find(y_repnd > mindl);
+
+        y_repnd(ind_replace_nd) = maxdl; 
+        y_repnd(ind_replace_md) = mindl; 
+
         end
 
         I = tiedrank(y_repnd); 
@@ -228,21 +235,20 @@ VarS_corr = 0;
    
     x = Sorted(:,1);
     y = Sorted(:,2);
-    theil_nd = Sorted(:,3);
-
-    theil_ndind = find(theil_nd);
 
     [N c]=size(x);
    
     Comb = combnk(1:N,2);
     
-    if ~isempty(theil_ndind)
+    if and(~isempty(theil_ndind),~isempty(theil_mdind))
         
         Senline_i(i) = zeros(1,100);
         for i = 1:100
 
         y(theil_ndind) = Sorted(theil_ndind,2).*rand(size(Sorted(theil_ndind,2))); 
 
+        y(theil_mdind) = Sorted(theil_mdind,2).*(1+rand(size(Sorted(theil_mdind,2)))); 
+    
 
         if N > 2;
         deltay=diff(y(Comb),1,2);
@@ -291,7 +297,14 @@ AkTheiSen = @(p) (ATS_func(p,Sorted,n));
   
    clear ATK_slopes ATK_S 
    
+   
+   if N > 2;
      ATK_slopes = (min(theil):(max(theil)-min(theil))/100:max(theil));
+   else
+     ATK_slopes = (1.1*(min(Sorted(:,2))-max(Sorted(:,2))):(max(Sorted(:,2))-min(Sorted(:,2)))/100:1.1*(max(Sorted(:,2))-min(Sorted(:,2))));  
+   end
+        
+     
      ATK_S = zeros(size(ATK_slopes));
      
     if sum(deltax) == 0
@@ -319,7 +332,7 @@ AkTheiSen = @(p) (ATS_func(p,Sorted,n));
                 
 
                 ATK_slopes = (ATK_slopes(ind_neg):(ATK_slopes(ind_pos)-ATK_slopes(ind_neg))/100:ATK_slopes(ind_pos));   
-                
+                    ATK_S = zeros(size(ATK_slopes));
 
                    for m = 1:length(ATK_slopes)
                         ATK_S(m) = AkTheiSen(ATK_slopes(m));         % S-Values corresponding to slopes

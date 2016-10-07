@@ -93,7 +93,7 @@ set(handles.N,'String',sprintf('Total data points: %d',Ntotobs));
 set(handles.Nnd,'String',sprintf('Number of non-detects: %d',Nndobs));
 set(handles.text19,'String',sprintf('Number of max.-detects: %d',Nmdobs));
 
-  if sum(Nd_indseas)>0
+  if sum(Nd_indseas) + sum(Md_indseas) > 0
    set(handles.text18,'String',sprintf('Theil-Sen Slope (90%% CI) = %#.2g - %#.2g /year',Senline_min(1)*365.25, Senline_max(1)*365.25));
   else
    set(handles.text18,'String',sprintf('Theil-Sen Slope = %#.2g/year',Senline_min(1)*365.25));
@@ -205,7 +205,7 @@ set(handles.text19,'String',sprintf('Number of max.-detects: %d',Nmdobs));
   
    
 
-  if sum(Nd_indseas)>0
+  if sum(Nd_indseas) + sum(Md_indseas) > 0
     set(handles.text18,'String',sprintf('Theil-Sen Slope (90%% CI) = %#.2g - %#.2g /year',Senline_min(get(handles.popupmenu2, 'Value'))*365.25, Senline_max(get(handles.popupmenu2, 'Value'))*365.25));
   else
     set(handles.text18,'String',sprintf('Theil-Sen Slope = %#.2g/year',Senline_min(get(handles.popupmenu2, 'Value'))*365.25));
@@ -358,7 +358,7 @@ ylabel(cocheader) %To update!!!
 datetick('x','mmm-yy')
 
 
-  if sum(Nd_indseas)>0
+  if sum(Nd_indseas) + sum(Md_indseas) > 0
     set(handles.text18,'String',sprintf('Theil-Sen Slope (90%% CI) = %#.2g - %#.2g /year',Senline_min(get(handles.popupmenu2, 'Value'))*365.25, Senline_max(get(handles.popupmenu2, 'Value'))*365.25));
   else
     set(handles.text18,'String',sprintf('Theil-Sen Slope = %#.2g/year',Senline_min(get(handles.popupmenu2, 'Value'))*365.25));

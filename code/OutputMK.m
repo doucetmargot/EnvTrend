@@ -62,7 +62,7 @@ set(handles.Nnd,'String',sprintf('Number of non-detects: %d',Nndobs));
 set(handles.text17,'String',sprintf('Number of max.-detects: %d',Nmdobs));
 
 
-if sum(Nd_ind)>0
+if sum(Nd_ind)+sum(Md_ind)>0
    set(handles.text16,'String',sprintf('Theil-Sen Slope (90%% CI) = %#.2g - %#.2g/year',Senline_min(1)*365.25,Senline_max(1)*365.25));
 else
     set(handles.text16,'String',sprintf('Theil-Sen Slope = %#.2g/year',Senline_min(1)*365.25));
@@ -143,7 +143,7 @@ set(handles.N,'String',sprintf('Total data points: %d',Ntotobs));
 set(handles.Nnd,'String',sprintf('Number of non-detects: %d',Nndobs));
 set(handles.text17,'String',sprintf('Number of max.-detects: %d',Nmdobs));
 
-if sum(Nd_ind)>0
+if sum(Nd_ind)+sum(Md_ind) > 0
    set(handles.text16,'String',sprintf('Theil-Sen Slope (90%% CI) = %#.2g - %#.2g/year',Senline_min(1)*365.25,Senline_max(1)*365.25));
 else
     set(handles.text16,'String',sprintf('Theil-Sen Slope = %#.2g/year',Senline_min(1)*365.25));

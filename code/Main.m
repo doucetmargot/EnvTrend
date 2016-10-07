@@ -40,7 +40,7 @@ varargout{1} = handles.output;
 % --- Executes on button press in buttonselectfile.
 function buttonselectfile_Callback(~,~, handles)
 global Filename Pathname 
-[Filename,Pathname] = uigetfile({'*.xls'}, 'Select Database Input File');
+[Filename,Pathname] = uigetfile({'*.xls';'*.xlsx'}, 'Select Database Input File');
 [~,sheets] = xlsfinfo([Pathname, Filename]);
 
 set(handles.filestring,'String',Filename);
