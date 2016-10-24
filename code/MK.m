@@ -324,6 +324,22 @@ AkTheiSen = @(p) ATS_func(p,Sorted,n);
 
                         Akritas_Theil_Sen_line = (ATK_slopes(ind_neg)+ATK_slopes(ind_pos))/(2);
                         
+                        
+                       if abs(Akritas_Theil_Sen_line)*365.25 >= 1e-6 ;
+                           
+                       ATK_slopes = (ATK_slopes(ind_neg):(ATK_slopes(ind_pos)-ATK_slopes(ind_neg))/100:ATK_slopes(ind_pos));   
+
+                       for m = 1:length(ATK_slopes)
+                            ATK_S(m) = AkTheiSen(ATK_slopes(m));         % S-Values corresponding to slopes
+                       end
+
+                        ind_neg = find(ATK_S>0,1,'last');
+                        ind_pos = find((ATK_S<0),1,'first');
+
+                        Akritas_Theil_Sen_line = (ATK_slopes(ind_neg)+ATK_slopes(ind_pos))/(2);
+                        
+                        end
+                        
                         end
                          end
                     end

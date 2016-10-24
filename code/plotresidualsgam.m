@@ -86,19 +86,25 @@ res_md = Samplesm(:,j)./(polyval(PARS(1:2),X(Md_ind)));
 
 res = (vertcat(res_d,res_nd,res_md));
 
-if length(res)>15;
 
-    [~,pall(j)]=chi2gof(res,...
-        'CDF',@(z)gamcdf(z,1/(PARS(3)^2),(PARS(3)^2)),'nparams',1,'Emin',3);
+if length(res)<15;
+    edges = icdf('gam',[0.001,1/3,2/3,0.999],1/(PARS(3)^2),(PARS(3)^2));
+elseif length(res)<50;
+    edges = zeros(round(length(res)/5)+1,1);
+    probint = edges;
+    probint(1) = 0.001;
+    probint(end) = 0.999;
+    for p=1:length(edges)-2;
+        probint(p+1) = p/round(length(res)/5);
+    end
+    edges = icdf('gam',probint,1/(PARS(3)^2),(PARS(3)^2));
 else
-     [~,pall(j)]=chi2gof(res,'nbins',3,...
+    edges = icdf('gam',[0.001,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.999],1/(PARS(3)^2),(PARS(3)^2));
+end
+   [~,pall(j)]=chi2gof(res,'Edges',edges,...
         'CDF',@(z)gamcdf(z,1/(PARS(3)^2),(PARS(3)^2)),'nparams',1,'Emin',1);
-end
 
-if isnan(pall(j))
-         [~,pall(j)]=chi2gof(res,'nbins',3,...  % repeat if error thrown due to sparse data
-        'CDF',@(z)gamcdf(z,1/(PARS(3)^2),(PARS(3)^2)),'nparams',1,'Emin',0);
-end
+
 
 
 end
