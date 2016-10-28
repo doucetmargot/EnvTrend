@@ -4,7 +4,7 @@ Copyright (c) 2016, Margot Doucet
 doucetmargot@hotmail.com
 
 This program has been developed in order to serve as a tool to assist scientists in decision-making and analysis. It is by no means 
-intended as a substitute for human judgement or as a check on the quality of data collected.
+intended as a substitute for human judgement, common sense, due diligence or as a check on the quality of data collected.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
