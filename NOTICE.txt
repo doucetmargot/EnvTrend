@@ -1,7 +1,7 @@
 NOTICE
 
 Copyright (c) 2016, Margot Doucet
-doucetmargot@hotmail.com
+eddysoftware.mail@gmail.com
 
 This program has been developed in order to serve as a tool to assist scientists in decision-making and analysis. It is by no means 
 intended as a substitute for human judgement, common sense, due diligence or as a check on the quality of data collected.
