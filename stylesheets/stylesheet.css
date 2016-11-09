@@ -522,7 +522,7 @@ a.button {
   padding-top: 22px;
   padding-left: 68px;
   font-family: 'Architects Daughter', 'Helvetica Neue', Helvetica, Arial, serif;
-  font-size: 23px;
+  font-size: 22px;
   line-height: 1.2;
   color: #fff;
 }
@@ -538,7 +538,7 @@ header a.button {
 }
 aside a.button {
   display: block;
-  width: 138px;
+  width: 156px;
   padding-left: 64px;
   margin-bottom: 20px;
   font-size: 21px;
