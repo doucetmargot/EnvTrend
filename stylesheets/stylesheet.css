@@ -517,12 +517,12 @@ aside#sidebar p.repo-owner a {
 }
 
 a.button {
-  width: 156px;
-  height: 70px;
-  padding-top: 16px;
+  width: 134px;
+  height: 58px;
+  padding-top: 22px;
   padding-left: 68px;
   font-family: 'Architects Daughter', 'Helvetica Neue', Helvetica, Arial, serif;
-  font-size: 18px;
+  font-size: 23px;
   line-height: 1.2;
   color: #fff;
 }
@@ -538,10 +538,10 @@ header a.button {
 }
 aside a.button {
   display: block;
-  width: 156px;
+  width: 138px;
   padding-left: 64px;
   margin-bottom: 20px;
-  font-size: 18px;
+  font-size: 21px;
   background: transparent url(../images/download-button.png) 0 0 no-repeat;
 }
 
@@ -878,4 +878,3 @@ footer a:hover {
 
 /* Mobile Portrait Size to Mobile Landscape Size (devices and browsers) */
 @media only screen and (max-width: 479px) { }
-
